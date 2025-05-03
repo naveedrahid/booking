@@ -5,7 +5,6 @@ const sendMail = require('../config/mailer');
 const crypto = require('crypto');
 
 const auth = {
-    
     login: async (req, res) => {
         const { email, password } = req.body;
         try {
