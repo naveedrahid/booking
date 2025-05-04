@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get('/user', protect , user.getUsers);
 router.get('/user/:id', protect , user.getUserById);
-router.post('/user', protect, user.createUser);
 router.put('/user/:id', protect, user.update);
+router.post('/user', protect, user.createUser);
 router.delete('/user/:id', protect, user.delete);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const Role = require('../models/roleModel');
+const Permission = require('../models/permissionModel');
 
 const role = {
 
@@ -29,11 +30,12 @@ const role = {
 
     create: async (req, res) => {
         try {
-            const newRole = await Role.create({
-                name: req.body.name,
-                permissions: req.body.permissions
-            });
+            const { name, permissions } = req.body;
+            if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
+                return res.status(400).json({ message: 'Permissions are required and must be a non-empty array' });
+            }
 
+            const newRole = await Role.create({ name, permissions });
             res.status(201).json({
                 message: 'Role created successfully',
                 data: newRole
@@ -41,6 +43,75 @@ const role = {
 
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    },
+
+    assignPersmission: async (req, res) => {
+        try {
+            const roleId = req.params.id;
+            const permissions = Array.isArray(req.body.permissions) ? req.body.permissions : [req.body.permissions];
+            const role = await Role.findById(roleId);
+
+            if (!role) return res.status(404).json({ message: 'Role not found' });
+
+            const isAlreadyAssigned = permissions.some(p => role.permissions.includes(p));
+            if (isAlreadyAssigned) {
+                return res.status(400).json({ message: 'Permissions are already assigned to the role' });
+            }
+
+            for (const permissionId of permissions) {
+                const exists = await Permission.findById(permissionId);
+                if (!exists) {
+                    return res.status(400).json({
+                        message: `Permission with ID ${permissionId} does not exist`,
+                    });
+                }
+
+                if (!role.permissions.includes(permissionId)) {
+                    role.permissions.push(permissionId);
+                }
+            }
+
+            role.permissions.push(...permissions);
+            await role.save();
+
+            res.status(200).json({
+                message: 'Permissions successfully assigned to role',
+                data: role
+            });
+
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    unAssignPersmission: async (req, res) => {
+        try {
+            const roleId = req.params.id;
+            const permissions = Array.isArray(req.body.permissions) ? req.body.permissions : [req.body.permissions];
+            const role = await Role.findById(roleId);
+            if (!role) return res.status(404).json({ message: 'Role not found' });
+
+            const notExist = permissions.filter(p => !role.permissions.includes(p));
+            if (notExist.length > 0) {
+                return res.status(400).json({
+                    message: 'Some permissions do not exist in the role',
+                    notAssigned: notExist
+                });
+            }
+
+            permissions.forEach(permissionId => {
+                const index = role.permissions.indexOf(permissionId);
+                if (index > -1) {
+                    role.permissions.splice(index, 1);
+                }
+            });
+
+            await role.save();
+            res.status(200).json({ message: 'Unassign permissions successfully', data: role });
+
+        } catch (error) {
+            res.status(500).json({ message: error.message })
         }
     },
 

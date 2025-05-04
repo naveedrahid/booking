@@ -25,6 +25,16 @@ const user = {
 
     createUser: async (req, res) => {
         try {
+            const existingUsers = await User.countDocuments();
+
+            // Token required if at least one user exists
+            if (existingUsers > 0 && !req.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid token',
+                });
+            }
+
             const user = await User.create(req.body);
             res.status(201).json({
                 success: true,
