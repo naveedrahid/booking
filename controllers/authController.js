@@ -11,8 +11,6 @@ const auth = {
             const user = await User.findOne({ email }).select('+password');
             if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
-            console.log('User found:', user); // Debug: Check user data and password
-
             const isMatch = await user.matchPassword(password);
             if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
 

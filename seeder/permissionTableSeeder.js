@@ -8,31 +8,92 @@ const permissionSeeder = async () => {
             name: 'view_user',
             method: 'GET',
             route: '/user',
-            description: 'Get all users',
         },
         {
             name: 'view_user_by_id',
             method: 'GET',
             route: '/user/:id',
-            description: 'Get a single user by ID',
         },
         {
             name: 'create_user',
             method: 'POST',
             route: '/user',
-            description: 'Create a new user',
         },
         {
             name: 'update_user',
             method: 'PUT',
             route: '/user/:id',
-            description: 'Update a user by ID',
         },
         {
             name: 'delete_user',
             method: 'DELETE',
             route: '/user/:id',
-            description: 'Delete a user by ID',
+        },
+
+        /* Role Permissions*/ 
+
+        {
+            name: 'view_role',
+            method: 'GET',
+            route: '/roles',
+        },
+        {
+            name: 'view_role_by_id',
+            method: 'GET',
+            route: '/roles/:id',
+        },
+        {
+            name: 'create_role',
+            method: 'POST',
+            route: '/roles',
+        },
+        {
+            name: 'update_role_by_id',
+            method: 'PUT',
+            route: '/roles/:id',
+        },
+        {
+            name: 'remove_role_by_id',
+            method: 'PATCH',
+            route: '/roles/:id',
+        },
+        {
+            name: 'update_role',
+            method: 'PATCH',
+            route: '/roles/:id/remove-permission',
+        },
+        {
+            name: 'delete_role',
+            method: 'DELETE',
+            route: '/roles/:id',
+        },
+
+        /* Permission */
+        
+        {
+            name: 'view_permission',
+            method: 'GET',
+            route: '/permissions',
+        },
+        {
+            name: 'view_permission_by_id',
+            method: 'GET',
+            route: '/permissions/:id',
+        },
+        {
+            name: 'create_permission',
+            method: 'POST',
+            route: '/permissions',
+        },
+        {
+            name: 'update_permission',
+            method: 'PUT',
+            route: '/permissions/:id',
+        },
+        {
+            name: 'delete_permission',
+            method: 'DELETE',
+            route: '/permissions/:id',
         },
     ]);
 
