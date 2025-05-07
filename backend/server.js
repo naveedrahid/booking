@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 // const dbSeeder = require('./seeder/databaseSeeder');
 
 dotenv.config();
+
 // connectDB().then(async () => {
 //     if (process.env.NODE_ENV !== 'production') {
 //         await dbSeeder();
