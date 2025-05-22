@@ -5,19 +5,56 @@ const sendMail = require('../config/mailer');
 const crypto = require('crypto');
 
 const auth = {
+    // login: async (req, res) => {
+    //     const { email, password } = req.body;
+    //     try {
+    //         const user = await User.findOne({ email }).select('+password');
+    //         if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+
+    //         const isMatch = await user.matchPassword(password);
+    //         if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+
+    //         const token = generateToken(user._id);
+    //         res.json({
+    //             success: true,
+    //             token,
+    //             user: {
+    //                 id: user._id,
+    //                 name: user.name,
+    //                 email: user.email,
+    //                 role_id: user.role_id,
+    //             },
+    //         });
+
+    //     } catch (error) {
+    //         res.status(500).json({ message: 'Server error', error: error.message });
+    //     }
+    // },
+
     login: async (req, res) => {
         const { email, password } = req.body;
         try {
             const user = await User.findOne({ email }).select('+password');
-            if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid email or password' });
+            }
 
             const isMatch = await user.matchPassword(password);
-            if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Invalid email or password' });
+            }
 
-            const token = generateToken(user._id);
+            const token = generateToken(user._id); // Generate JWT token
+
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // false on localhost if needed
+                sameSite: 'Strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            });
+
             res.json({
                 success: true,
-                token,
                 user: {
                     id: user._id,
                     name: user.name,
@@ -60,6 +97,11 @@ const auth = {
 
     logout: async (req, res) => {
         try {
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'Strict',
+            });
             res.status(200).json({ message: 'Logout successful' });
         } catch (error) {
             res.status(500).json({ message: 'Logout failed', error: error.message });

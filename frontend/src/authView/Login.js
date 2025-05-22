@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from "react";
+import { AuthService } from '../utils/auth.service';
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -8,25 +9,14 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await fetch("http://localhost:5000/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
+        AuthService.removeUsername();
 
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                alert("Login successful!");
-            } else {
-                alert("Login failed: " + data.message);
-            }
-        } catch (err) {
-            console.error("Error:", err);
-            alert("Something went wrong.");
+        const result = await AuthService.login({ email, password });
+        if (result.success) {
+            alert("Login successful!");
+            console.log("Cookie:", document.cookie);
+        } else {
+            alert("Login failed: " + result.error);
         }
     };
 
